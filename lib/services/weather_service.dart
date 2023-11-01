@@ -7,9 +7,8 @@ import 'package:http/http.dart' as http;
 
 
 class WeatherService{
-  static const BASE_URL ='http://api.openweathermap.org/data/2.5/weather';
+  static const BASE_URL ='https://api.openweathermap.org/data/2.5/weather';
   final String apiKey;
-// ='f1c10ae4ceb1e88b90444376f97e92bd'
 
 
   WeatherService(this.apiKey);
@@ -38,7 +37,7 @@ class WeatherService{
     // convert the location into a list of placemark objects
     List<Placemark> placemarks=
       await placemarkFromCoordinates(position.latitude, position.longitude);
-
+    print(placemarks[0]);
     // extract the city name from the first placemark
     String? city = placemarks[0].locality;
 
