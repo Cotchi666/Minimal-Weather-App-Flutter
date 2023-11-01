@@ -1,18 +1,20 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:demo/models/weather_model.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+
 
 class WeatherService{
   static const BASE_URL ='http://api.openweathermap.org/data/2.5/weather';
   final String apiKey;
-
+// ='f1c10ae4ceb1e88b90444376f97e92bd'
 
 
   WeatherService(this.apiKey);
 
-  Future<Weather> getWeather(String cityName)async{
+  Future<Weather> getWeather(String cityName) async {
     final response = await http.get(Uri.parse('$BASE_URL?q=$cityName&appid=$apiKey&units=metric'));
   
 
@@ -24,15 +26,23 @@ class WeatherService{
     } 
   }
   Future<String> getCurrentCity() async{
-    LocationPermisson permisson = await Geolocator.checkPermisson();
-    if(permisson == LocationPermisson.denied){
-      permisson = await Geolocation.requestPermisson();
-
+    //get permisson form user
+    LocationPermission permisson = await Geolocator.checkPermission();
+    if(permisson == LocationPermission.denied){
+      permisson = await Geolocator.requestPermission();
     }
 
+    //fetch the current location
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    
+    // convert the location into a list of placemark objects
+    List<Placemark> placemarks=
+      await placemarkFromCoordinates(position.latitude, position.longitude);
 
-    List<Placemark> place
+    // extract the city name from the first placemark
+    String? city = placemarks[0].locality;
+
+    return city ?? "";
   }
 
 }
